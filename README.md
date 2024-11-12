@@ -12,7 +12,7 @@ O script `dlt_to_duckdb.py` implementa um pipeline de dados EL (Extract, Load) q
 
 Ele utiliza as seguintes bibliotecas Python:
 
-- `dlt`: A biblioteca Data Load Tool, que fornece abstrações para construir pipelines de dados.
+- `dlt`: A biblioteca data load tool, que fornece abstrações para construir pipelines de dados.
 - `duckdb`: O banco de dados DuckDB, utilizado como destino para os dados.
 - `logging`: Para configurar um sistema de logs durante a execução do script.
 
