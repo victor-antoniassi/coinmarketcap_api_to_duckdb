@@ -1,37 +1,38 @@
+# Simple script for querying cryptocurrency prices using the dlt library
 
-# Script simples para consulta de cotações de criptomoedas utilizando a biblioteca dlt
+This repository contains a Python script that demonstrates the use of the [dlt](https://github.com/dlt-hub/dlt) library, a library for data extraction and loading processes.
 
-Este repositório contém um script Python que demonstra o uso da biblioteca [dlt](https://github.com/dlt-hub/dlt), uma biblioteca para processos de extração e carregamento de dados.
+## About the Script
 
-## Sobre o Script
+The `dlt_to_duckdb.py` script implements an EL (Extract, Load) data pipeline that:
 
-O script `dlt_to_duckdb.py` implementa um pipeline de dados EL (Extract, Load) que:
+1. Extracts price and market metric data for the cryptocurrencies BTC, ETH, and LTC from the CoinMarketCap API.
+2. Transforms the data into a structured format.
+3. Loads the data into a local DuckDB database.
 
-1. Extrai dados de preços e métricas de mercado das criptomoedas BTC, ETH e LTC da API da CoinMarketCap.
-2. Transforma os dados em um formato estruturado.
-3. Carrega os dados em um banco de dados DuckDB local.
+It uses the following Python libraries:
 
-Ele utiliza as seguintes bibliotecas Python:
+- `dlt`: The data load tool library, which provides abstractions for building data pipelines.
+- `duckdb`: The DuckDB database, used as the destination for the data.
+- `logging`: For configuring a logging system during script execution.
 
-- `dlt`: A biblioteca data load tool, que fornece abstrações para construir pipelines de dados.
-- `duckdb`: O banco de dados DuckDB, utilizado como destino para os dados.
-- `logging`: Para configurar um sistema de logs durante a execução do script.
-
-## Pré-requisitos para execução do script
+## Prerequisites for running the script
 
 1. **Python 3.9+**
-2. **Bibliotecas Python**: `dlt`, `logging`, `duckdb`
-3. [Chave de API da CoinMarketCap](https://coinmarketcap.com/api/): Deve ser configurada no arquivo `secrets.toml` do DLT.
+2. **Python Libraries**: `dlt`, `logging`, `duckdb`
+3. [CoinMarketCap API Key](https://coinmarketcap.com/api/): Must be configured in the `secrets.toml` file of the DLT.
 
-## Estrutura do Repositório
+## Repository Structure
+
 ```
 ├── .dlt
 │   └── secrets.toml
 ├── dlt_to_duckdb.py
 └── requirements.txt
 ```
-## Possíveis melhorias
 
-- Explorar outras funcionalidades da biblioteca dlt, como o suporte a outras fontes de dados e destinos.
-- Adicionar tratamento de erros e monitoramento mais avançado.
-- Integrar o pipeline com o dbt e ferramentas de orquestração na nuvem.
+## Possible Improvements
+
+- Explore other features of the dlt library, such as support for additional data sources and destinations.
+- Add more advanced error handling and monitoring.
+- Integrate the pipeline with dbt and workflow orchestration tools.
