@@ -1,4 +1,5 @@
-# Consulta de cotações de criptomoedas utilizando a biblioteca dlt
+
+# Script simples para consulta de cotações de criptomoedas utilizando a biblioteca dlt
 
 Este repositório contém um script Python que demonstra o uso da biblioteca [dlt](https://github.com/dlt-hub/dlt), uma biblioteca para processos de extração e carregamento de dados.
 
@@ -16,60 +17,20 @@ Ele utiliza as seguintes bibliotecas Python:
 - `duckdb`: O banco de dados DuckDB, utilizado como destino para os dados.
 - `logging`: Para configurar um sistema de logs durante a execução do script.
 
-## Pré-requisitos
+## Pré-requisitos para execução do script
 
 1. **Python 3.9+**
 2. **Bibliotecas Python**: `dlt`, `logging`, `duckdb`
 3. [Chave de API da CoinMarketCap](https://coinmarketcap.com/api/): Deve ser configurada no arquivo `secrets.toml` do DLT.
 
-## Instruções de Uso
-
-1. Clone este repositório:
-
-   ```bash
-   git clone https://github.com/victor-antoniassi/coinmarketcap_api_to_duckdb.git
-   cd coinmarketcap_api_to_duckdb
-   ```
-
-2. Crie e ative um ambiente virtual Python:
-
-   ```bash
-   python -m venv venv
-   source venv/bin/activate
-   ```
-
-3. Instale as dependências necessárias:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Configure sua chave de API da CoinMarketCap no arquivo e o local para criação do duckdb `secrets.toml` dentro da pasta `.dlt`:
-
-5. Execute o script:
-
-   ```bash
-   python dlt_to_duckdb.py
-   ```
-
-   O script irá extrair os dados da API da CoinMarketCap, transformá-los e carregá-los em um banco de dados DuckDB local.
-
-6. Após a execução, você pode consultar os dados carregados no banco DuckDB:
-
-   ```python
-   import duckdb
-
-   with duckdb.connect("seu arquivo do duckdb .db") as db:
-       db.sql("SELECT * FROM quotes_data.latest_quotes_data").show()
-   ```
-
 ## Estrutura do Repositório
-
-- `dlt_to_duckdb.py`: O script principal que implementa o pipeline de dados.
-- `requirements.txt`: Lista das dependências Python necessárias.
-- `secrets.toml`: Arquivo de configuração para armazenar a chave de API da CoinMarketCap.
-
-## Próximos Passos
+```
+├── .dlt
+│   └── secrets.toml
+├── dlt_to_duckdb.py
+└── requirements.txt
+```
+## Possíveis melhorias
 
 - Explorar outras funcionalidades da biblioteca dlt, como o suporte a outras fontes de dados e destinos.
 - Adicionar tratamento de erros e monitoramento mais avançado.
