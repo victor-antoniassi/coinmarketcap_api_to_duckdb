@@ -2,7 +2,7 @@
 
 An Extract-Load (EL) pipeline that fetches cryptocurrency market data from CoinMarketCap's API and stores it in a [DuckDB](https://github.com/duckdb/duckdb) database using [dlt](https://github.com/dlt-hub/dlt).
 
-![Pipeline Architecture](https://cdn.some.pics/antoniassi/6747819244abe.png)
+![](https://cdn.some.pics/antoniassi/674796b3e5e93.png)
 
 ## 🎯 Features
 
