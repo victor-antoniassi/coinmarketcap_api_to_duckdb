@@ -115,8 +115,7 @@ def run_pipeline():
     # Initialize pipeline with configuration parameters
     pipeline = dlt.pipeline(
         pipeline_name="crypto_quotes_pipeline",  # Unique identifier for the pipeline
-        destination=dlt.destinations.duckdb(     # Configure DuckDB as the destination
-            dlt.secrets["destination.duckdb_path"]
+        destination=dlt.secrets["destination.duckdb_path"] # Configure DuckDB as the destination
         ),
         dataset_name="quotes_data"              # Name of the target dataset
     )
