@@ -1,141 +1,141 @@
 """
-Script para extrair dados de criptomoedas da CoinMarketCap API e carregar em um banco DuckDB.
+Script to extract cryptocurrency data from CoinMarketCap API and load it into a DuckDB database.
 
-Este script implementa um pipeline de dados ETL (Extract, Transform, Load) que:
-1. Extrai dados de preços e métricas de mercado das criptomoedas BTC, ETH e LTC
-2. Transforma os dados em um formato estruturado
-3. Carrega os dados em um banco de dados DuckDB local
+This script implements an EL (Extract, Load) data pipeline that:
+1. Extracts price data and market metrics for BTC, ETH, and LTC cryptocurrencies
+2. Loads the data directly into a local DuckDB database
 
-Requisitos:
+Requirements:
     - Python 3.9+
-    - Bibliotecas: dlt, logging, duckdb
-    - Chave de API da CoinMarketCap (deve ser configurada em .dlt/secrets.toml)
+    - Libraries: dlt, logging, duckdb
+    - CoinMarketCap API key (must be configured in .dlt/secrets.toml)
 
-Autor: Victor Antoniassi
-Data: Novembro 2024
+Author: Victor Antoniassi
+Date: November 2024
 """
 
+# Required libraries for API interaction, logging and database operations
 import dlt
-from dlt.sources.helpers.rest_client import RESTClient
-from dlt.sources.helpers.rest_client.auth import APIKeyAuth
 import logging
 import duckdb
+from dlt.sources.helpers.rest_client import RESTClient
+from dlt.sources.helpers.rest_client.auth import APIKeyAuth
 
-# Configuração do sistema de logs para monitoramento e debugging
-# Definimos o nível como INFO para ver informações importantes durante a execução
+
+# Set up basic logging configuration
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 @dlt.resource(name="latest_quotes_data")
 def extract_and_load():
     """
-    Função principal que extrai dados da API da CoinMarketCap e prepara para carregamento.
+    Main function that extracts data from CoinMarketCap API and prepares it for loading.
     
-    Esta função:
-    1. Autentica com a API usando uma chave armazenada de forma segura
-    2. Faz uma requisição para obter dados das criptomoedas BTC, ETH e LTC
-    3. Processa a resposta e extrai métricas relevantes
-    4. Gera registros formatados para serem carregados no banco de dados
+    This function:
+    1. Authenticates with the API using a securely stored key
+    2. Makes a request to get data for BTC, ETH, and LTC cryptocurrencies
+    3. Loads the data directly into the database without transformations
     
     Yields:
-        dict: Dicionário contendo as métricas de cada criptomoeda com as seguintes chaves:
-            - symbol: Símbolo da criptomoeda (ex: BTC)
-            - price: Preço atual em USD
-            - volume_24h: Volume de negociação nas últimas 24 horas
-            - market_cap: Capitalização de mercado
-            - last_updated: Data/hora da última atualização
+        dict: Dictionary containing metrics for each cryptocurrency with the following keys:
+            - symbol: Cryptocurrency symbol (e.g., BTC)
+            - price: Current price in USD
+            - volume_24h: Trading volume in the last 24 hours
+            - market_cap: Market capitalization
+            - last_updated: Last update timestamp
     """
-    # Obtém a chave de API do arquivo de secrets do dlt
+    # Retrieve API key from dlt secrets configuration
     api_key = dlt.secrets["coinmarketcap.api_key"]
     
-    # Configura a autenticação com a API usando APIKeyAuth
+    # Set up authentication for CoinMarketCap API
     auth = APIKeyAuth(
-        name="X-CMC_PRO_API_KEY",  # Nome do header de autenticação requerido pela API
-        api_key=api_key,           # Chave de API obtida do arquivo de secrets
-        location="header"          # Localização onde a chave deve ser enviada
+        name="X-CMC_PRO_API_KEY",  # Header name required by CoinMarketCap
+        api_key=api_key,           # API key from secrets
+        location="header"          # Location to place the authentication
     )
     
-    # Inicializa o cliente REST com a URL base da API e configurações de autenticação
+    # Initialize REST client with API endpoint and auth settings
     client = RESTClient(
         base_url="https://pro-api.coinmarketcap.com/v1",
         auth=auth
     )
 
-    # Faz a requisição HTTP GET para obter os dados mais recentes
-    # Especificamos as criptomoedas desejadas e a moeda de conversão (USD)
+    # Make API request to get latest cryptocurrency quotes
     response = client.get(
         "/cryptocurrency/quotes/latest",
         params={
-            "symbol": "BTC,ETH,LTC",  # Símbolos das criptomoedas que queremos dados
-            "convert": "USD"           # Moeda para conversão dos valores
+            "symbol": "BTC,ETH,LTC",  # Target cryptocurrencies
+            "convert": "USD"           # Convert values to USD
         }
     )
     
-    # Verifica se a requisição foi bem-sucedida
-    # Um código 200 indica sucesso na resposta HTTP
+    # Verify API response status
     if response.status_code != 200:
         logger.error(
-            "Erro na chamada da API. Status: %s, Detalhes: %s",
+            "API call error. Status: %s, Details: %s",
             response.status_code,
             response.text
         )
         response.raise_for_status()
 
-    # Processa cada criptomoeda retornada pela API
+    # Process each cryptocurrency in the API response
     for coin_data in response.json()["data"].values():
-        # Extrai dados específicos do USD do objeto de cotações
+        # Extract USD quote data from the nested response structure
         quote = coin_data.get("quote", {}).get("USD", {})
         
-        # Cria um dicionário com os dados que queremos armazenar
+        # Create data dictionary with required fields
         data = {
-            "symbol": coin_data.get("symbol"),      # Símbolo da criptomoeda
-            "price": quote.get("price"),            # Preço atual
-            "volume_24h": quote.get("volume_24h"),  # Volume de negociação 24h
-            "market_cap": quote.get("market_cap"),  # Capitalização de mercado
-            "last_updated": quote.get("last_updated")  # Timestamp da atualização
+            "symbol": coin_data.get("symbol"),      # Cryptocurrency identifier
+            "price": quote.get("price"),            # Current market price
+            "volume_24h": quote.get("volume_24h"),  # 24-hour trading volume
+            "market_cap": quote.get("market_cap"),  # Total market capitalization
+            "last_updated": quote.get("last_updated")  # Last data update time
         }
         
-        # Verifica se temos dados válidos antes de yield
-        # Isso evita carregar registros vazios no banco de dados
+        # Validate data before yielding
         if any(data.values()):
             yield data
         else:
             logger.warning(
-                "Registro vazio ignorado para: %s",
+                "Empty record ignored for: %s",
                 coin_data.get("symbol")
             )
 
+
 def run_pipeline():
     """
-    Configura e executa o pipeline de dados.
+    Configure and execute the EL pipeline.
     
-    Esta função:
-    1. Cria um novo pipeline dlt configurado para usar DuckDB
-    2. Executa o pipeline com nossa função de extração
-    3. Registra informações sobre o carregamento dos dados
-    
-    O banco de dados será criado no arquivo 'crypto_quotes.db' no diretório atual.
+    This function:
+    1. Creates a new dlt pipeline configured to use DuckDB
+    2. Executes the pipeline with our extraction function
+    3. Logs information about data loading
     """
-    # Configura o pipeline especificando nome, destino e dataset
+    # Initialize pipeline with configuration parameters
     pipeline = dlt.pipeline(
-        pipeline_name="crypto_quotes_pipeline",  # Nome único do pipeline
-        destination=dlt.destinations.duckdb(dlt.secrets["destination.duckdb_path"]),  # Banco DuckDB
-        dataset_name="quotes_data"  # Nome do schema do banco
+        pipeline_name="crypto_quotes_pipeline",  # Unique identifier for the pipeline
+        destination=dlt.destinations.duckdb(     # Configure DuckDB as the destination
+            dlt.secrets["destination.duckdb_path"]
+        ),
+        dataset_name="quotes_data"              # Name of the target dataset
     )
 
-    # Executa o pipeline e captura informações sobre o carregamento
+    # Execute the pipeline and store loading results
     load_info = pipeline.run(extract_and_load)
-    logger.info("Informações de carregamento do pipeline: %s", load_info)
+    logger.info("Pipeline loading information: %s", load_info)
+
 
 def query_data():
     """
-    Função para consultar os dados carregados no banco de dados DuckDB.
+    Function to query the data loaded in the DuckDB database.
     """
+    # Connect to DuckDB and execute a sample query
     with duckdb.connect(dlt.secrets["destination.duckdb_path"]) as db:
-        # Executa a consulta SQL e exibe os resultados
         db.sql("SELECT * FROM quotes_data.latest_quotes_data").show()
-  
-# Ponto de entrada do script        
+
+
 if __name__ == "__main__":
-    run_pipeline(),
+    # Execute the pipeline and query the results
+    run_pipeline()
     query_data()
