@@ -1,7 +1,7 @@
 # Simple script for querying cryptocurrency prices using the dlt library
 
 This repository contains a Python script that demonstrates the use of the [dlt](https://github.com/dlt-hub/dlt) library, a library for data extraction and loading processes.
-![](https://cdn.some.pics/antoniassi/674780c16f5e4.png)
+![](https://cdn.some.pics/antoniassi/6747819244abe.png)
 
 ## About the Script
 
