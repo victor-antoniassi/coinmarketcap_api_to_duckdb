@@ -40,7 +40,7 @@ The pipeline collects these metrics for each cryptocurrency:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/coinmarketcap_api_to_duckdb.git
+   git clone https://github.com/victor-antoniassi/coinmarketcap_api_to_duckdb.git
    cd coinmarketcap_api_to_duckdb
    ```
 
