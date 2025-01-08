@@ -34,9 +34,8 @@ The pipeline collects these metrics for each cryptocurrency:
 
 1. Python 3.9 or higher
 2. CoinMarketCap API key ([Get it here](https://coinmarketcap.com/api/))
-3. Basic Python and database knowledge
 
-### Installation
+### How to run the script
 
 1. Clone the repository:
    ```bash
